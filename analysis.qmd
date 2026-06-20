@@ -29,27 +29,42 @@ Below is a visualization showing the trend in the number of unique named storms 
 #| warning: false
 #| message: false
 
-# Calculate number of named storms per year
+# Calculate number of named storms per year by status
 storms_per_year <- storms %>%
-  distinct(year, name) %>%
-  count(year, name = "num_storms")
+  filter(status %in% c("tropical depression", "tropical storm", "hurricane")) %>%
+  mutate(status = factor(status, levels = c("tropical depression", "tropical storm", "hurricane"))) %>%
+  distinct(year, name, status) %>%
+  count(year, status, name = "count") %>%
+  complete(year, status, fill = list(count = 0))
 
 # Plot using ggplot2
-ggplot(storms_per_year, aes(x = year, y = num_storms)) +
-  geom_line(color = "#1f77b4", linewidth = 1) +
-  geom_point(color = "#0f3d5f", size = 2) +
-  geom_smooth(method = "loess", color = "#ff7f0e", fill = "#ff7f0e", alpha = 0.1, formula = y ~ x) +
+ggplot(storms_per_year, aes(x = year, y = count, fill = status)) +
+  geom_area(position = "stack", alpha = 0.85, color = "white", linewidth = 0.1) +
+  scale_fill_manual(
+    values = c(
+      "tropical depression" = "#8cc5e3",
+      "tropical storm"      = "#f4a261",
+      "hurricane"           = "#b03a2e"
+    ),
+    labels = c(
+      "tropical depression" = "Tropical Depression",
+      "tropical storm"      = "Tropical Storm",
+      "hurricane"           = "Hurricane"
+    )
+  ) +
   labs(
-    title = "Named Storms Per Year (1975 - 2022)",
-    subtitle = "Tracking the frequency of tropical storms and hurricanes over time",
+    title = "Storm Frequency by Type (1975 - 2022)",
+    subtitle = "Annual counts of unique tropical depressions, tropical storms, and hurricanes",
     x = "Year",
     y = "Number of Unique Storms",
+    fill = "Storm Status",
     caption = "Source: dplyr::storms"
   ) +
   theme_minimal(base_size = 14) +
   theme(
     plot.title = element_text(face = "bold", size = 16, color = "#2c3e50"),
     plot.subtitle = element_text(size = 12, color = "#7f8c8d"),
+    legend.position = "bottom",
     panel.grid.minor = element_blank(),
     plot.caption = element_text(face = "italic", size = 9, color = "#bdc3c7")
   )
