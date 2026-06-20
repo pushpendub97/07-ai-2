@@ -1,0 +1,60 @@
+---
+title: "Exploring Storms"
+author: "Pushpendu Biswas"
+execute:
+  echo: false
+format:
+  html:
+    theme: cosmo
+    code-fold: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+suppressPackageStartupMessages(library(tidyverse))
+```
+
+## Introduction
+
+This analysis explores the historical data on storms from the `dplyr::storms` dataset, which includes tracking data for tropical storms and hurricanes.
+
+## Named Storms Per Year
+
+Below is a visualization showing the trend in the number of unique named storms recorded each year.
+
+```{r}
+#| label: plot-storms-per-year
+#| fig-cap: "Annual number of unique named storms."
+#| warning: false
+#| message: false
+
+# Calculate number of named storms per year
+storms_per_year <- storms %>%
+  distinct(year, name) %>%
+  count(year, name = "num_storms")
+
+# Plot using ggplot2
+ggplot(storms_per_year, aes(x = year, y = num_storms)) +
+  geom_line(color = "#1f77b4", linewidth = 1) +
+  geom_point(color = "#0f3d5f", size = 2) +
+  geom_smooth(method = "loess", color = "#ff7f0e", fill = "#ff7f0e", alpha = 0.1, formula = y ~ x) +
+  labs(
+    title = "Named Storms Per Year (1975 - 2022)",
+    subtitle = "Tracking the frequency of tropical storms and hurricanes over time",
+    x = "Year",
+    y = "Number of Unique Storms",
+    caption = "Source: dplyr::storms"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, color = "#2c3e50"),
+    plot.subtitle = element_text(size = 12, color = "#7f8c8d"),
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(face = "italic", size = 9, color = "#bdc3c7")
+  )
+```
+
+## Summary Statistics
+
+Over the period from `r min(storms$year)` to `r max(storms$year)`, there were a total of `r storms %>% distinct(year, name) %>% nrow()` unique storms tracked. The year with the highest number of named storms was `r storms %>% distinct(year, name) %>% count(year) %>% filter(n == max(n)) %>% pull(year)` with `r storms %>% distinct(year, name) %>% count(year) %>% filter(n == max(n)) %>% pull(n)` storms.

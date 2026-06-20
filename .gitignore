@@ -1,0 +1,18 @@
+# Quarto internal cache and build directories
+.quarto/
+_freeze/
+_site/
+_book/
+
+# Note: Generated HTML files (*.html) are explicitly NOT ignored per requirements.
+
+# R and RStudio project files
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+
+# OS files
+.DS_Store
+Thumbs.db
